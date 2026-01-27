@@ -1,0 +1,17 @@
+# Directories
+trimmed_dir: "trimmed"
+merged_dir: "merged"
+counts_dir: "counts"
+
+
+
+# Library Contants/ adapters
+five_prime_adapter_R1: "TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG"
+five_prime_constant_R1: "TAATACGACTCACTATAGGGACACAATGGACG"
+three_prime_constant_R1: "TAACGGCCGACATGAGAG"
+three_prime_adapter_R1: "CTGTCTCTTATACACATCTCCGAGCCCACGAGAC"
+
+three_prime_adapter_R2: "GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG"
+three_prime_constant_R2: "CTCTCATGTCGGCCGTTA"
+five_prime_constant_R2: "CGTCCATTGTGTCCCTATAGTGAGTCGTATTA"
+five_prime_adapter_R2: "CTGTCTCTTATACACATCTGACGCTGCCGACGA"

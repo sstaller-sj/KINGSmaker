@@ -1,0 +1,20 @@
+# Ignore raw data and counts
+counts/
+raw_data/
+input/fastq/
+input/leg_samples.tsv
+results/
+qc/
+trimmed/
+merged/
+
+
+# Ignore Snakemake's internal tracking
+.snakemake/
+
+# Ignore large results (optional: keep plots, ignore data)
+results/clustering/data/
+results/top_100_lists/
+
+# Ignore OS files
+.DS_Store
