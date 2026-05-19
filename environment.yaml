@@ -1,0 +1,21 @@
+name: kingsmaker
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python>=3.10
+  - snakemake>=7
+  - cutadapt
+  - pear
+  - fastqc
+  - pandas
+  - numpy
+  - pyyaml
+  - rapidfuzz
+  - python-Levenshtein
+  - umap-learn
+  - hdbscan
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - openpyxl
