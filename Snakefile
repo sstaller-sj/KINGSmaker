@@ -39,12 +39,14 @@ rule all:
         "results/final_synthesis_order_list.csv"
 rule trim:
     input:
-        R1 = lambda wc: SAMPLES[wc.sample]["R1"],
-        R2 = lambda wc: SAMPLES[wc.sample]["R2"]
+        R1 = lambda wc: metadata.loc[wc.sample, "R1"].split(","),
+        R2 = lambda wc: metadata.loc[wc.sample, "R2"].split(",")
     output:
-        R1 = "trimmed/{sample}_R1.fastq.gz",
-        R2 = "trimmed/{sample}_R2.fastq.gz"
+        R1 = temp("trimmed/{sample}_R1.fastq.gz"),
+        R2 = temp("trimmed/{sample}_R2.fastq.gz")
     threads: 8
+    resources:
+        disk_mb = 6000
     params:
         constant_5p_R1 = config["five_prime_constant_R1"],
         constant_3p_R1 = config["three_prime_constant_R1"],
@@ -69,7 +71,7 @@ rule trim:
             --trim-n \
             -m {params.minlen} \
             -o {output.R1} -p {output.R2} \
-            {input.R1} {input.R2}
+            <(cat {input.R1}) <(cat {input.R2})
         """
 
 rule merge_reads:
@@ -77,8 +79,10 @@ rule merge_reads:
         R1 = "trimmed/{sample}_R1.fastq.gz",
         R2 = "trimmed/{sample}_R2.fastq.gz"
     output:
-        assembled = "merged/{sample}.assembled.fastq.gz"
+        assembled = temp("merged/{sample}.assembled.fastq.gz")
     threads: 8
+    resources:
+        disk_mb = 6000
     shell:
         """
         # PEAR produces several files, we'll use a temp prefix
