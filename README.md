@@ -38,15 +38,14 @@ KINGSmaker/
 
 ## Requirements
 
-Install via conda:
+Create the conda environment from the provided spec:
 
 ```bash
-conda create -n kingsmaker -c conda-forge -c bioconda \
-    snakemake cutadapt pear fastqc \
-    pandas pyyaml rapidfuzz umap-learn hdbscan python-Levenshtein \
-    scikit-learn matplotlib seaborn openpyxl numpy
+conda env create -f environment.yaml
 conda activate kingsmaker
 ```
+
+(Or with `mamba env create -f environment.yaml` if you have mamba — much faster.)
 
 | Tool / library | Purpose |
 |----------------|---------|
