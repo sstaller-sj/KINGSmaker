@@ -51,7 +51,16 @@ else:
     df.to_csv(snakemake.output.clustered_csv, index=False)
 
     kings = []
-    enrich_col = 'Cumulative_Enrichment' if 'Cumulative_Enrichment' in df.columns else df.columns[1]
+    # Cumulative_Enrichment can be the "x" placeholder when First/Last Stage tags aren't set — fall back to an RPM column (highest-abundance proxy) before any other numeric column
+    if 'Cumulative_Enrichment' in df.columns and pd.api.types.is_numeric_dtype(df['Cumulative_Enrichment']):
+        enrich_col = 'Cumulative_Enrichment'
+    else:
+        rpm_cols = [c for c in df.columns if c.endswith('_RPM') and pd.api.types.is_numeric_dtype(df[c])]
+        if rpm_cols:
+            enrich_col = rpm_cols[0]
+        else:
+            numeric_cols = df.select_dtypes(include='number').columns.tolist()
+            enrich_col = numeric_cols[0] if numeric_cols else df.columns[1]
 
     for cid in df['Cluster_ID'].unique():
         if cid == -1: continue
@@ -88,7 +97,7 @@ else:
 
     plt.figure(figsize=(12, 10))
     hue_col = 'Lineage' if 'Lineage' in df.columns else 'Cluster_ID'
-    size_col = 'Cumulative_Enrichment' if 'Cumulative_Enrichment' in df.columns else None
+    size_col = 'Cumulative_Enrichment' if 'Cumulative_Enrichment' in df.columns and pd.api.types.is_numeric_dtype(df['Cumulative_Enrichment']) else None
     size_data = np.log10(df[size_col] + 1) if size_col else None
 
     scatter = sns.scatterplot(
