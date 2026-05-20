@@ -5,8 +5,8 @@ import os
 with open("config/config.yaml") as f:
     config = yaml.safe_load(f)
 
-metadata = pd.read_csv("input/samples.tsv", sep="\t").set_index("Sample", drop=False)
-SAMPLES = [str(s) for s in metadata.index.tolist()]
+metadata = pd.read_csv("input/samples.tsv", sep="\t", dtype={"Sample": str}).set_index("Sample", drop=False)
+SAMPLES = metadata.index.tolist()
 
 
 def _stage_round(label):
