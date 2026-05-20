@@ -77,14 +77,23 @@ Tab-separated, one row per sample. Required columns:
 | `Fraction` | Sort fraction — typically `Top`, `Bot`, or `All` (for unsorted inputs). |
 | `Group` | Sample subgroup — typically `Singlet` or `Doublet`. |
 | `Experiment` | Free-text experiment tag (provenance only). |
+| `Stage` | `First`, `Last`, or blank. Tags which round serves as the input baseline and which as the endpoint for enrichment metrics. Only one round can be `First`, only one `Last`. Both are optional — metrics that need them are filled with `x` if missing. |
 
 Example:
 
 ```
-Sample   R1                                       R2                                       Round  Fraction  Group     Experiment
-3412244  /Volumes/Z/.../L008_R1_001.fastq.gz      /Volumes/Z/.../L008_R2_001.fastq.gz      1      All       Singlet   F11R
-3412250  /Volumes/Z/.../L008_R1_001.fastq.gz      /Volumes/Z/.../L008_R2_001.fastq.gz      6      Top       Singlet   F11R
+Sample   R1                                       R2                                       Round  Fraction  Group     Experiment  Stage
+3412244  /Volumes/Z/.../L008_R1_001.fastq.gz      /Volumes/Z/.../L008_R2_001.fastq.gz      1      All       Singlet   F11R        First
+3412250  /Volumes/Z/.../L008_R1_001.fastq.gz      /Volumes/Z/.../L008_R2_001.fastq.gz      6      Top       Singlet   F11R        Last
 ```
+
+#### How `Stage` drives the enrichment math
+
+- **`Cumulative_Enrichment`** = `R{Last}_Top / R{First}_Global` — requires both `First` and `Last` to be tagged, plus `Top` samples in the last round.
+- **`Partition_Ratio_R{Last}`** = `R{Last}_Top / R{Last}_Bot` — requires `Last` plus both `Top` and `Bot` samples in that round.
+- **`Aggregation_Index`** = `R{Last}_Singlet_Top / R{Last}_Doublet_Top` — requires `Last` plus both groups with `Top` samples.
+
+When a metric can't be computed (the data isn't there), its column still appears in the master report but every cell is literally `x`, and no top-100 list is generated for it. This makes it obvious in the output which analyses ran and which were skipped.
 
 #### Multi-lane samples
 
@@ -151,17 +160,19 @@ Tune `disk_mb` once you've measured a real sample's peak intermediate size.
 
 ## Computed metrics
 
-Built from per-sample RPM columns (`R{round}_{group}_{fraction}_RPM`):
+Built from per-sample RPM columns (`R{round}_{group}_{fraction}_RPM`). Round numbers in metric names come from the `Stage` tags — `R{First}` and `R{Last}` substitute the round you marked in `samples.tsv`.
 
 | Metric | Formula | Interpretation |
 |--------|---------|----------------|
-| `R1_Global_RPM` | Σ R1 RPM | Starting pool abundance |
-| `R6_Total_Top_RPM` | Σ R6 Top RPM | Final-round fluorescent-fraction abundance |
-| `R6_Total_Bot_RPM` | Σ R6 Bot RPM | Final-round non-fluorescent-fraction abundance |
-| `Cumulative_Enrichment` | (R6_Top + 0.1) / (R1 + 0.1) | Fold-enrichment, start → finish |
-| `Partition_Ratio_R6` | (R6_Top + 0.1) / (R6_Bot + 0.1) | Preference for fluorescent fraction at endpoint |
-| `Aggregation_Index` | (Singlet_Top + 0.1) / (Doublet_Top + 0.1) | Tendency to behave monomerically |
+| `R{First}_Global_RPM` | Σ RPM across all First-round samples | Starting pool abundance |
+| `R{Last}_Total_Top_RPM` | Σ RPM across Last-round Top samples | Endpoint fluorescent-fraction abundance |
+| `R{Last}_Total_Bot_RPM` | Σ RPM across Last-round Bot samples | Endpoint non-fluorescent-fraction abundance |
+| `Cumulative_Enrichment` | (R{Last}_Top + 0.1) / (R{First}_Global + 0.1) | Fold-enrichment, start → finish |
+| `Partition_Ratio_R{Last}` | (R{Last}_Top + 0.1) / (R{Last}_Bot + 0.1) | Preference for fluorescent fraction at endpoint |
+| `Aggregation_Index` | (R{Last}_Singlet_Top + 0.1) / (R{Last}_Doublet_Top + 0.1) | Tendency to behave monomerically |
 | `Lineage` | Fuzzy match to known library scaffolds | `Lib_6`, `Lib_7a/b`, `Lib_9a/b`, etc. |
+
+Any metric whose inputs aren't present in `samples.tsv` is filled with the literal string `x` in the master report (no top-100 list, no clustering).
 
 `Seq_ID` is an md5 hash of the sequence — stable and identical across every output file, so any two CSVs can be joined by `Seq_ID`.
 

@@ -1,7 +1,7 @@
-Sample	R1	R2	Round	Fraction	Group	Experiment
-3412244	input/fastq/3412244_Test_003_S947_L008_R1_001.fastq.gz	input/fastq/3412244_Test_003_S947_L008_R2_001.fastq.gz	1	All	Singlet	F11R
-3412245	input/fastq/3412245_Test_004_S948_L008_R1_001.fastq.gz	input/fastq/3412245_Test_004_S948_L008_R2_001.fastq.gz	1	All	Doublet	F11R
-3412250	input/fastq/3412250_Test_009_S953_L008_R1_001.fastq.gz	input/fastq/3412250_Test_009_S953_L008_R2_001.fastq.gz	6	Top	Singlet	F11R
-3412251	input/fastq/3412251_Test_0010_S954_L008_R1_001.fastq.gz	input/fastq/3412251_Test_0010_S954_L008_R2_001.fastq.gz	6	Bot	Singlet	F11R
-3412252	input/fastq/3412252_Test_0011_S955_L008_R1_001.fastq.gz	input/fastq/3412252_Test_0011_S955_L008_R2_001.fastq.gz	6	Top	Doublet	F11R
-3412253	input/fastq/3412253_Test_0012_S956_L008_R1_001.fastq.gz	input/fastq/3412253_Test_0012_S956_L008_R2_001.fastq.gz	6	Bot	Doublet	F11R
+Sample	R1	R2	Round	Fraction	Group	Experiment	Stage
+3412244	input/fastq/3412244_Test_003_S947_L008_R1_001.fastq.gz	input/fastq/3412244_Test_003_S947_L008_R2_001.fastq.gz	1	All	Singlet	F11R	First
+3412245	input/fastq/3412245_Test_004_S948_L008_R1_001.fastq.gz	input/fastq/3412245_Test_004_S948_L008_R2_001.fastq.gz	1	All	Doublet	F11R	First
+3412250	input/fastq/3412250_Test_009_S953_L008_R1_001.fastq.gz	input/fastq/3412250_Test_009_S953_L008_R2_001.fastq.gz	6	Top	Singlet	F11R	Last
+3412251	input/fastq/3412251_Test_0010_S954_L008_R1_001.fastq.gz	input/fastq/3412251_Test_0010_S954_L008_R2_001.fastq.gz	6	Bot	Singlet	F11R	Last
+3412252	input/fastq/3412252_Test_0011_S955_L008_R1_001.fastq.gz	input/fastq/3412252_Test_0011_S955_L008_R2_001.fastq.gz	6	Top	Doublet	F11R	Last
+3412253	input/fastq/3412253_Test_0012_S956_L008_R1_001.fastq.gz	input/fastq/3412253_Test_0012_S956_L008_R2_001.fastq.gz	6	Bot	Doublet	F11R	Last
