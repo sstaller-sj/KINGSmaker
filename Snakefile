@@ -168,13 +168,16 @@ rule generate_overlap_excel:
 
 def get_order_list_kings(wildcards):
     checkpoint_output = checkpoints.analyze_enrichment.get().output.top_dir
-    available = set(os.listdir(checkpoint_output))
+    available = sorted(os.listdir(checkpoint_output))
 
     candidates = []
     if LAST_ROUND is not None:
-        for fraction in ('singlet', 'doublet'):
-            fname = f"top_100_r{LAST_ROUND}_{fraction}_top_rpm.csv"
-            if fname in available:
+        # Match last-round Top files with or without an embedded Lib tag (e.g. top_100_r5_singlet_top_rpm.csv OR top_100_r5_lib9_singlet_top_rpm.csv)
+        prefix = f"top_100_r{LAST_ROUND}_"
+        for fname in available:
+            if not (fname.startswith(prefix) and fname.endswith("_top_rpm.csv")):
+                continue
+            if "singlet" in fname or "doublet" in fname:
                 candidates.append(f"results/clustering/kings/{fname[:-4]}_clustered_kings.csv")
     for always_try in ("top_100_cumulative_enrichment.csv", "master_top_selection_winners.csv"):
         if always_try in available:
