@@ -65,6 +65,8 @@ rule trim:
     shell:
         """
         mkdir -p trimmed
+        cat {input.R1} > trimmed/{wildcards.sample}.input_R1.fastq.gz
+        cat {input.R2} > trimmed/{wildcards.sample}.input_R2.fastq.gz
         cutadapt \
             -g {params.adapter_5p_R1} \
             -G {params.adapter_5p_R2} \
@@ -75,7 +77,9 @@ rule trim:
             --trim-n \
             -m {params.minlen} \
             -o {output.R1} -p {output.R2} \
-            <(cat {input.R1}) <(cat {input.R2})
+            trimmed/{wildcards.sample}.input_R1.fastq.gz \
+            trimmed/{wildcards.sample}.input_R2.fastq.gz
+        rm -f trimmed/{wildcards.sample}.input_R1.fastq.gz trimmed/{wildcards.sample}.input_R2.fastq.gz
         """
 
 
@@ -87,12 +91,20 @@ rule merge_reads:
         assembled = temp("merged/{sample}.assembled.fastq.gz")
     threads: 8
     resources:
-        disk_mb = 6000
+        disk_mb = 12000
     shell:
         """
-        pear -f {input.R1} -r {input.R2} -o merged/{wildcards.sample} -j {threads}
+        mkdir -p merged
+        gunzip -c {input.R1} > merged/{wildcards.sample}_R1.fastq
+        gunzip -c {input.R2} > merged/{wildcards.sample}_R2.fastq
+        pear -f merged/{wildcards.sample}_R1.fastq -r merged/{wildcards.sample}_R2.fastq -o merged/{wildcards.sample} -j {threads}
         gzip -c merged/{wildcards.sample}.assembled.fastq > {output.assembled}
-        rm merged/{wildcards.sample}.assembled.fastq
+        rm -f merged/{wildcards.sample}_R1.fastq \
+              merged/{wildcards.sample}_R2.fastq \
+              merged/{wildcards.sample}.assembled.fastq \
+              merged/{wildcards.sample}.discarded.fastq \
+              merged/{wildcards.sample}.unassembled.forward.fastq \
+              merged/{wildcards.sample}.unassembled.reverse.fastq
         """
 
 
