@@ -10,6 +10,12 @@ output_file = snakemake.output.report
 
 X = "x"  # marker placed in metric columns that can't be computed for the current Stage configuration
 
+# Per-library length bounds (inclusive) — 5th-95th percentile of unique-sequence length distributions
+LIB_LEN_BOUNDS = {
+    '6': (82, 91),
+    '9': (81, 164),
+}
+
 
 def identify_lineage(seq):
     seq = seq.replace('U', 'T').upper()
@@ -53,10 +59,26 @@ for sample_id in meta.index:
     df = pd.read_csv(path, sep=r'\s+', names=['count', 'sequence'], header=None)
     if df.empty:
         continue
+
+    row = meta.loc[sample_id]
+    lib_val = row.get('Lib') if 'Lib' in meta.columns else None
+
+    # Drop sequences outside the library's expected length range before normalizing — keeps RPM meaningful within the real library
+    if pd.notna(lib_val):
+        bounds = LIB_LEN_BOUNDS.get(str(lib_val).strip())
+        if bounds:
+            lo, hi = bounds
+            df = df[df['sequence'].str.len().between(lo, hi)]
+            if df.empty:
+                continue
+
     total = df['count'].sum()
     df['RPM'] = (df['count'] / total) * 1e6
-    row = meta.loc[sample_id]
-    col_name = f"R{row['Round']}_{row['Group']}_{row['Fraction']}_RPM"
+    # Include Lib in the column name when present so 6S and 9S samples don't collide on R{N}_Singlet_All_RPM
+    if pd.notna(lib_val) and str(lib_val).strip():
+        col_name = f"R{row['Round']}_Lib{lib_val}_{row['Group']}_{row['Fraction']}_RPM"
+    else:
+        col_name = f"R{row['Round']}_{row['Group']}_{row['Fraction']}_RPM"
     df = df[['sequence', 'RPM']].set_index('sequence')
     df.columns = [col_name]
     all_dfs.append(df)
